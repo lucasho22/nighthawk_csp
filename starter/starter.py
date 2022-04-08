@@ -1,6 +1,8 @@
 import requests
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, url_for, redirect, jsonify, make_response
 from algorithm.image import image_data
+
+from cruddy.query import *
 
 from pathlib import \
     Path  # https://medium.com/@ageitgey/python-3-quick-tip-the-easy-way-to-deal-with-file-paths-on-windows-mac-and
@@ -11,6 +13,11 @@ app_starter = Blueprint('starter', __name__,
                         template_folder='templates/starter/',
                         static_folder='static',
                         static_url_path='static/assets')
+
+
+@app_starter.route('/')
+def binary():
+    return render_template("binary_conversion.html")
 
 
 @app_starter.route('/greet', methods=['GET', 'POST'])
@@ -24,9 +31,17 @@ def greet():
     return render_template("greet.html", name="World")
 
 
-@app_starter.route('/binary/')
-def binary():
-    return render_template("binary.html")
+@app_starter.route('/binary_login', methods=["GET", "POST"])
+def binary_login():
+    # obtains form inputs and fulfills login requirements
+    if request.form:
+        email = request.form.get("email")
+        password = request.form.get("password")
+        if login(email, password):       # zero index [0] used as email is a tuple
+            return redirect(url_for('starter.binary'))
+
+    # if not logged in, show the login page
+    return render_template("binary_login.html")
 
 
 @app_starter.route('/rgb/')

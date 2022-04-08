@@ -1,4 +1,6 @@
 """control dependencies to support CRUD routes and APIs"""
+import this
+
 from flask import Blueprint, render_template
 from flask_restful import Api, Resource
 import requests

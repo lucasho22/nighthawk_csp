@@ -22,6 +22,7 @@ app_crud = Blueprint('crud', __name__,
 @app_crud.route('/')
 @login_required  # Flask-Login uses this decorator to restrict acess to logged in users
 def crud():
+    print('inside crud')
     """obtains all Users from table and loads Admin Form"""
     return render_template("crud.html", table=users_all())
 
@@ -34,7 +35,7 @@ def unauthorized():
 
 
 # if login url, show phones table only
-@app_crud.route('/login/', methods=["GET", "POST"])
+@app_crud.route('/crud_login', methods=["GET", "POST"])
 def crud_login():
     # obtains form inputs and fulfills login requirements
     if request.form:
@@ -46,6 +47,12 @@ def crud_login():
     # if not logged in, show the login page
     return render_template("login.html")
 
+# logout user
+@app_crud.route('/crud_logout')
+@login_required
+def crud_logout():
+    logout_user() # removes login state of user from session
+    return render_template("login.html")
 
 @app_crud.route('/authorize/', methods=["GET", "POST"])
 def crud_authorize():
@@ -55,8 +62,9 @@ def crud_authorize():
         user_name = request.form.get("user_name")
         email = request.form.get("email")
         password1 = request.form.get("password1")
+        phone = request.form.get("phone")
         password2 = request.form.get("password1")           # password should be verified
-        if authorize(user_name, email, password1):    # zero index [0] used as user_name and email are type tuple
+        if authorize(user_name, email, password1, phone):    # zero index [0] used as user_name and email are type tuple
             return redirect(url_for('crud.crud_login'))
     # show the auth user page if the above fails for some reason
     return render_template("authorize.html")
